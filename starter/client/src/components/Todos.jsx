@@ -47,7 +47,7 @@ export function Todos() {
                 <Button
                   icon
                   color="blue"
-                  onClick={() => onEditButtonClick(todo.todoId)}
+                  onClick={() => onEditButtonClick(todo)}
                 >
                   <Icon name="pencil" />
                 </Button>
@@ -61,8 +61,8 @@ export function Todos() {
                   <Icon name="delete" />
                 </Button>
               </Grid.Column>
-              {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
+              {todo.imageUrl && (
+                <Image src={todo.imageUrl} size="small" wrapped />
               )}
               <Grid.Column width={16}>
                 <Divider />
@@ -77,11 +77,12 @@ export function Todos() {
   async function onTodoDelete(todoId) {
     try {
       const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
+        audience: `https://todo-api/`,
         scope: 'delete:todo'
       })
       await deleteTodo(accessToken, todoId)
       setTodos(todos.filter((todo) => todo.todoId !== todoId))
+      alert('Todo deleted successfully')
     } catch (e) {
       alert('Todo deletion failed')
     }
@@ -91,7 +92,7 @@ export function Todos() {
     try {
       const todo = todos[pos]
       const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
+        audience: `https://todo-api/`,
         scope: 'write:todo'
       })
       await patchTodo(accessToken, todo.todoId, {
@@ -110,8 +111,8 @@ export function Todos() {
     }
   }
 
-  function onEditButtonClick(todoId) {
-    navigate(`/todos/${todoId}/edit`)
+  function onEditButtonClick(todo) {
+    navigate(`/todos/${todo.todoId}/edit`, { state: { todo } })
   }
 
   const { user, getAccessTokenSilently } = useAuth0()
@@ -123,12 +124,14 @@ export function Todos() {
     name: user.name,
     email: user.email
   })
-
+  const { isAuthenticated, isLoading } = useAuth0()
   useEffect(() => {
+
     async function foo() {
+      console.log('Fetching todos')
       try {
         const accessToken = await getAccessTokenSilently({
-          audience: `https://test-endpoint.auth0.com/api/v2/`,
+          audience: `https://todo-api/`,
           scope: 'read:todos'
         })
         console.log('Access token: ' + accessToken)
@@ -136,6 +139,7 @@ export function Todos() {
         setTodos(todos)
         setLoadingTodos(false)
       } catch (e) {
+        console.log(">>> ERROR getAccessTokenSilently:", e)
         alert(`Failed to fetch todos: ${e.message}`)
       }
     }

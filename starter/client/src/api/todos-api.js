@@ -1,7 +1,21 @@
 import Axios from 'axios'
 
+export async function getTodosTest() {
+  console.log('Fetching todos test')
+
+  const response = await fetch(`${process.env.REACT_APP_API_ENDPOINT}/todos`)
+  const result = await response.json()
+  console.log('Todos:', result)
+  return result.items
+}
+
+export async function getImageUrl(groupId) {
+  const response = await Axios.get(`${process.env.REACT_APP_API_ENDPOINT}/image/${groupId}`)
+  return response.data.imageUrl
+}
+
 export async function getTodos(idToken) {
-  console.log('Fetching todos')
+  console.log('Fetching todosaaaa')
 
   const response = await Axios.get(
     `${process.env.REACT_APP_API_ENDPOINT}/todos`,
@@ -31,7 +45,7 @@ export async function createTodo(idToken, newTodo) {
 }
 
 export async function patchTodo(idToken, todoId, updatedTodo) {
-  await Axios.patch(
+  const response = await Axios.patch(
     `${process.env.REACT_APP_API_ENDPOINT}/todos/${todoId}`,
     JSON.stringify(updatedTodo),
     {
@@ -41,6 +55,7 @@ export async function patchTodo(idToken, todoId, updatedTodo) {
       }
     }
   )
+  return response.data.item
 }
 
 export async function deleteTodo(idToken, todoId) {
@@ -65,6 +80,8 @@ export async function getUploadUrl(idToken, todoId) {
   )
   return response.data.uploadUrl
 }
+
+
 
 export async function uploadFile(uploadUrl, file) {
   await Axios.put(uploadUrl, file)
