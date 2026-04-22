@@ -1,7 +1,10 @@
 import middy from '@middy/core'
 import cors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
-import { createImage, getUploadUrl } from '../../businessLogic/groups.mjs'
+import { createImage, getUploadUrl } from '../../businessLogic/todos.mjs'
+import { createLogger } from '../utils/logger.mjs'
+
+const logger = createLogger('uploadUrl')
 
 export const handler = middy()
   .use(httpErrorHandler())

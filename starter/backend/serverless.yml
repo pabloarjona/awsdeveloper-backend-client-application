@@ -12,6 +12,10 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
 
+  tracing:
+    lambda: true
+    apiGateway: true
+    
   environment:
     GROUPS_TABLE: GroupsF-${self:provider.stage}
     IMAGES_TABLE: Images-${self:provider.stage}
@@ -60,6 +64,9 @@ functions:
           authorizer: Auth
           path: todos
           cors: true
+          request:
+            schemas:
+              application/json: ${file(models/create-todo-request.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:

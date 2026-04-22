@@ -4,7 +4,7 @@ import {PutObjectCommand, S3Client} from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import AWSXRay from 'aws-xray-sdk-core'
 
-export class GroupsAccess {
+export class TodosAccess {
     constructor(
         docClient = AWSXRay.captureAWSv3Client(new DynamoDB()), 
         groupsTable = process.env.GROUPS_TABLE,
@@ -19,7 +19,7 @@ export class GroupsAccess {
         this.s3Client = new S3Client()
     }   
 
-    async getAllGroups(userId) {
+    async getAllTodos(userId) {
         console.log('Getting all groups for user:', userId)
         const result = await this.dynamoDbClient.query({
         TableName: this.groupsTable,
@@ -31,16 +31,16 @@ export class GroupsAccess {
         return result.Items || []
     }
 
-    async createGroup(createGroupRequest) {    
-        console.log('Creating group:', createGroupRequest)
+    async createTodo(createTodoRequest) {    
+        console.log('Creating group:', createTodoRequest)
         await this.dynamoDbClient.put({
             TableName: this.groupsTable,
-            Item: createGroupRequest
+            Item: createTodoRequest
         })
-        return createGroupRequest
+        return createTodoRequest
     }
 
-    async updateGroup(groupId, userId, updateGroupRequest) {
+    async updateTodo(groupId, userId, updateTodoRequest) {
         console.log('Updating group with id: ', groupId, ' for user: ', userId)
         await this.dynamoDbClient.update({
             TableName: this.groupsTable,
@@ -51,11 +51,13 @@ export class GroupsAccess {
             UpdateExpression: 'set #attr1 = :attr1, #attr2 = :attr2',
             ExpressionAttributeNames: {
                 '#attr1': 'name',
-                '#attr2': 'description'
+                '#attr2': 'dueDate',
+                '#attr2': 'done'                
             },
             ExpressionAttributeValues: {
-                ':attr1': updateGroupRequest.name,
-                ':attr2': updateGroupRequest.description
+                ':attr1': updateTodoRequest.name,
+                ':attr2': updateTodoRequest.dueDate,
+                ':attr2': updateTodoRequest.done            
             },
             ReturnValues: 'ALL_NEW'
         })
@@ -71,10 +73,10 @@ export class GroupsAccess {
             },
             UpdateExpression: 'set #attr1 = :attr1',
             ExpressionAttributeNames: {
-            '#attr1': 'imageUrl'
+            '#attr1': 'attachmentUrl'
             },
             ExpressionAttributeValues: {    
-            ':attr1': newGroupRequest.imageUrl
+            ':attr1': newGroupRequest.attachmentUrl
             },
             ReturnValues: 'ALL_NEW'
         })
@@ -92,7 +94,7 @@ export class GroupsAccess {
         return url
     }
 
-    async deleteGroup(todoId, userId){
+    async deleteTodo(todoId, userId){
         console.log('Deleting todo with id: ', todoId, ' for user: ', userId)
         await this.dynamoDbClient.delete({
             TableName: this.groupsTable,

@@ -1,8 +1,10 @@
 import middy from '@middy/core'
 import cors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
-import { updateGroup } from '../../businessLogic/groups.mjs'
+import { updateTodo } from '../../businessLogic/todos.mjs'
+import { createLogger } from '../utils/logger.mjs'
 
+const logger = createLogger('updatetodo')
 export const handler = middy()
   .use(httpErrorHandler())
   .use(cors({
@@ -10,11 +12,11 @@ export const handler = middy()
     credentials: true
   }))
   .handler(async (event) => {
-    console.log('Processing event: ', event)
+    logger.error('Processing event: ', event)
     const todoId = event.pathParameters.todoId
     const userId = event.requestContext.authorizer.principalId
     const parsedBody = JSON.parse(event.body)
-    await updateGroup(todoId, userId, parsedBody)
+    await updateTodo(todoId, userId, parsedBody)
     return {
       statusCode: 200,
       body: JSON.stringify({

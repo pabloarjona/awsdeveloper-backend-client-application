@@ -2,7 +2,10 @@ import middy from '@middy/core'
 import cors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
 import createError from 'http-errors'
-import { deleteGroup } from '../../businessLogic/groups.mjs'
+import { deleteTodo } from '../../businessLogic/todos.mjs'
+import { createLogger } from '../utils/logger.mjs'
+
+const logger = createLogger('deletetodo')
 
 export const handler = middy()
   .use(httpErrorHandler())
@@ -11,10 +14,10 @@ export const handler = middy()
     credentials: true
   }))
   .handler(async (event) => {
-    console.log('Processing event: ', event)
+      logger.error('Processing event: ', event)
       const todoId = event.pathParameters.todoId
       const userId = event.requestContext.authorizer.principalId
-      console.log('Deleting todo with id: ', todoId, ' for user: ', userId)
+      logger.error('Deleting todo with id: ', todoId, ' for user: ', userId)
       if (!todoId || !userId) {
         console.error('Missing todoId or userId in path parameters')
         throw createError(
@@ -22,7 +25,7 @@ export const handler = middy()
           JSON.stringify({ error: 'Missing todoId or userId in path parameters' })  
         )
       }
-      await deleteGroup(todoId, userId)
+      await deleteTodo(todoId, userId)
       return {
         statusCode: 204,
         body: JSON.stringify({'message': 'Todo deleted successfully :)'

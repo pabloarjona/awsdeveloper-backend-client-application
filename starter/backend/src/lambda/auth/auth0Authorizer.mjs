@@ -29,7 +29,7 @@ const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
 export async function handler(event) {
   try {
     const jsonwebtoken = await verifyToken(event.authorizationToken)
-    console.log('User was authorized')
+    logger.error('User was authorized')
     return {
       principalId: jsonwebtoken.sub,
       policyDocument: {
