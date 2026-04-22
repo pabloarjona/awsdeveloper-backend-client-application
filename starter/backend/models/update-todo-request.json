@@ -9,7 +9,10 @@
         "description":{
             "type":"string"
         },
-        "attachmentUrl":{
+        "imageUrl":{
+            "type":"string"
+        },
+        "dueDate":{
             "type":"string"
         }
     },

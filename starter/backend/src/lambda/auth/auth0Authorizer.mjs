@@ -1,6 +1,6 @@
 import axios from 'axios'
 import jsonwebtoken from 'jsonwebtoken'
-import { createLogger } from '../../utils/logger.mjs'
+import { createLogger } from '../utils/logger.mjs'
 
 const logger = createLogger('auth')
 
@@ -72,16 +72,4 @@ async function verifyToken(authHeader) {
   const token = split[1]
   //if (token !== 'secret') throw new Error('Invalid token')
   return jsonwebtoken.verify(token, certifcate, { algorithms: ['RS256'], audience: 'https://todo-api/', issuer: 'https://dev-jny8adnk3a6tggyy.us.auth0.com/' })
-}
-
-function getToken(authHeader) {
-  if (!authHeader) throw new Error('No authentication header')
-
-  if (!authHeader.toLowerCase().startsWith('bearer '))
-    throw new Error('Invalid authentication header')
-
-  const split = authHeader.split(' ')
-  const token = split[1]
-  //if (token !== 'secret') throw new Error('Invalid token')
-  return jsonwebtoken.verify(token, certifcate, { algorithms: ['RS256'] })
 }

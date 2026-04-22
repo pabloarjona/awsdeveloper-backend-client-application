@@ -1,5 +1,5 @@
 import { jsonwebtoken } from 'jsonwebtoken'
-import { createLogger } from '../utils/logger.mjs'
+import { createLogger } from './logger.mjs'
 
 const logger = createLogger('utils')
 /**

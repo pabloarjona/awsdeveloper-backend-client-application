@@ -1,10 +1,7 @@
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
-
-
-const dynamoDbClient = DynamoDBDocument.from(new DynamoDB())
-
-const imagesIndex = process.env.IMAGE_ID_INDEX
+import middy from '@middy/core'
+import cors from '@middy/http-cors'
+import httpErrorHandler from '@middy/http-error-handler'
+import { getImage } from '../../businessLogic/groups.mjs'
 
 // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
 export const handler = middy()
@@ -14,32 +11,16 @@ export const handler = middy()
     credentials: true
   }))
   .handler(async (event) => {
-      console.log('Processing event: ', event)
-/*   const imageId = event.pathParameters.imageId
-  
-  const result = await dynamoDbClient.query({
-    TableName: imageTable,
-    IndexName: imagesIndex,
-    KeyConditionExpression: 'imageId = :imageId',
-    ExpressionAttributeValues: {
-      ':imageId': imageId
+    const todoId = event.pathParameters.todoId
+    const userId = event.requestContext.authorizer.principalId
+    const result = await getImage(todoId, userId)
+    
+    if (result.Count !== 0) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify(result.Items[0])
+      }
     }
-  }) */
-  const groupId = event.pathParameters.todoId
-  const result = await dynamoDbClient.query({
-    TableName: imageTable,
-    KeyConditionExpression: 'groupId = :groupId',
-    ExpressionAttributeValues: {
-      ':groupId': groupId
-    }
-  })
-  
-  if (result.Count !== 0) {
-    return {
-      statusCode: 200,
-      body: JSON.stringify(result.Items[0])
-    }
-  }
-  throw createError(404, JSON.stringify({ error: 'Image not found' }))
+    throw createError(404, JSON.stringify({ error: 'Image not found' }))
 })
 
